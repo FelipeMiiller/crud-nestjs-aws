@@ -12,7 +12,7 @@ import { ProductsModule } from './products/products.module';
     UsersModule,
     ProductsModule,
     ConfigModule.forRoot({
-      envFilePath: '.development.env',
+      envFilePath: '.env',
       isGlobal: true,
     }),
   ],
