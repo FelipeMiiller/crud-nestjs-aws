@@ -1,47 +1,47 @@
-import { Body, Controller, Post, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, UsePipes, ValidationPipe } from '@nestjs/common';
 import { AwsCognitoService } from './aws-cognito.service';
-import { AuthLoginUserDto } from './dto/auth-login-user.dto';
-import { AuthRegisterUserDto } from './dto/auth-register-user.dto';
-import { AuthEmailDto } from './dto/auth-email.dto';
-import { AuthChangePasswordUserDto } from './dto/auth-change-password-user.dto';
-import { AuthConfirmPasswordUserDto } from './dto/auth-confirm-password-user.dto';
+import { AuthService } from './auth.service';
+import { ApiTags } from '@nestjs/swagger';
+import { ChangePasswordDto, ConfirmPasswordDto, EmailDto, SignInDto, SignUpDto } from './dto/auth.dto';
 
-@Controller('api/v1/auth')
+@ApiTags('Auth')
+@Controller('/auth')
 export class AuthController {
-  constructor(private awsCognitoService: AwsCognitoService) {}
+  constructor(private awsCognitoService: AwsCognitoService, private authService: AuthService) {}
 
-  @Post('/register')
-  async register(@Body() authRegisterUserDto: AuthRegisterUserDto) {
-    return this.awsCognitoService.registerUser(authRegisterUserDto);
+  @Post('/signup')
+  @UsePipes(ValidationPipe)
+  async register(@Body() signUp: SignUpDto) {
+    return this.authService.signup(signUp);
   }
 
-  @Post('/login')
+  @Get('/signin')
   @UsePipes(ValidationPipe)
-  async login(@Body() authLoginUserDto: AuthLoginUserDto) {
-    return this.awsCognitoService.authenticateUser(authLoginUserDto);
+  async signin(@Query() signInDto: SignInDto) {
+    return this.authService.signin(signInDto);
   }
 
   @Post('/confimation-email')
   @UsePipes(ValidationPipe)
-  async confimationEmail(@Body() authConfirmationDto: AuthEmailDto) {
-    return this.awsCognitoService.authenticateConfimationEmail(authConfirmationDto);
+  async confimationEmail(@Body() authConfirmation: EmailDto) {
+    return this.awsCognitoService.authenticateConfimationEmail(authConfirmation);
   }
 
   @Post('/change-password')
   @UsePipes(ValidationPipe)
-  async changePassword(@Body() authChangePasswordUserDto: AuthChangePasswordUserDto) {
-    return this.awsCognitoService.changeUserPassword(authChangePasswordUserDto);
+  async changePassword(@Body() changePassword: ChangePasswordDto) {
+    return this.awsCognitoService.changeUserPassword(changePassword);
   }
 
   @Post('/forgot-password')
   @UsePipes(ValidationPipe)
-  async forgotPassword(@Body() authForgotPasswordUserDto: AuthEmailDto) {
-    return await this.awsCognitoService.forgotUserPassword(authForgotPasswordUserDto);
+  async forgotPassword(@Body() authForgotPassword: EmailDto) {
+    return await this.awsCognitoService.forgotUserPassword(authForgotPassword);
   }
 
   @Post('/confirm-password')
   @UsePipes(ValidationPipe)
-  async confirmPassword(@Body() authConfirmPasswordUserDto: AuthConfirmPasswordUserDto) {
-    return await this.awsCognitoService.confirmUserPassword(authConfirmPasswordUserDto);
+  async confirmPassword(@Body() confirmPassword: ConfirmPasswordDto) {
+    return await this.awsCognitoService.confirmUserPassword(confirmPassword);
   }
 }

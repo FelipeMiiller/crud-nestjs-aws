@@ -1,11 +1,8 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { AuthenticationDetails, CognitoUser, CognitoUserAttribute, CognitoUserPool } from 'amazon-cognito-identity-js';
-import { AuthLoginUserDto } from './dto/auth-login-user.dto';
-import { AuthRegisterUserDto } from './dto/auth-register-user.dto';
-import { AuthEmailDto } from './dto/auth-email.dto';
+
 import { CognitoToken } from './types/typesAuthCognito';
-import { AuthChangePasswordUserDto } from './dto/auth-change-password-user.dto';
-import { AuthConfirmPasswordUserDto } from './dto/auth-confirm-password-user.dto';
+import { ChangePasswordDto, ConfirmPasswordDto, EmailDto, SignInDto } from './dto/auth.dto';
 
 @Injectable()
 export class AwsCognitoService {
@@ -18,8 +15,8 @@ export class AwsCognitoService {
     });
   }
 
-  async registerUser(authRegisterUserDto: AuthRegisterUserDto) {
-    const { name, email, password } = authRegisterUserDto;
+  async registerUser(signUp: { name: string; email: string; password: string }) {
+    const { name, email, password } = signUp;
 
     const signinPromise = new Promise((resolve, reject) => {
       this.userPool.signUp(
@@ -60,8 +57,8 @@ export class AwsCognitoService {
     }
   }
 
-  async authenticateUser(authLoginUserDto: AuthLoginUserDto) {
-    const { email, password } = authLoginUserDto;
+  async authenticateUser(signInDto: SignInDto) {
+    const { email, password } = signInDto;
     const userData = {
       Username: email,
       Pool: this.userPool,
@@ -104,9 +101,9 @@ export class AwsCognitoService {
     }
   }
 
-  async authenticateConfimationEmail(AuthEmailDto: AuthEmailDto) {
+  async authenticateConfimationEmail(emailDto: EmailDto) {
     const userData = {
-      Username: AuthEmailDto.email,
+      Username: emailDto.email,
       Pool: this.userPool,
     };
     const userCognito = new CognitoUser(userData);
@@ -138,8 +135,8 @@ export class AwsCognitoService {
     }
   }
 
-  async changeUserPassword(authChangePasswordUserDto: AuthChangePasswordUserDto) {
-    const { email, currentPassword, newPassword } = authChangePasswordUserDto;
+  async changeUserPassword(authChangePasswordUser: ChangePasswordDto) {
+    const { email, currentPassword, newPassword } = authChangePasswordUser;
 
     const userData = {
       Username: email,
@@ -186,8 +183,8 @@ export class AwsCognitoService {
     }
   }
 
-  async forgotUserPassword(authForgotPasswordUserDto: AuthEmailDto) {
-    const { email } = authForgotPasswordUserDto;
+  async forgotUserPassword(emailDto: EmailDto) {
+    const { email } = emailDto;
 
     const userData = {
       Username: email,
@@ -208,8 +205,8 @@ export class AwsCognitoService {
     });
   }
 
-  async confirmUserPassword(authConfirmPasswordUserDto: AuthConfirmPasswordUserDto) {
-    const { email, confirmationCode, newPassword } = authConfirmPasswordUserDto;
+  async confirmUserPassword(confirmPassword: ConfirmPasswordDto) {
+    const { email, confirmationCode, newPassword } = confirmPassword;
 
     const userData = {
       Username: email,
