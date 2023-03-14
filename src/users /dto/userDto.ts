@@ -1,6 +1,6 @@
-import { Role } from '@prisma/client';
 import { IsBoolean, IsEmail, IsEnum, IsOptional, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { Role } from '@prisma/client';
 
 export class GetUserForIdDto {
   @ApiProperty()
@@ -11,6 +11,7 @@ export class GetUserForIdDto {
   @IsString()
   idCompany?: string;
 }
+
 
 export class GetUserForEmailDto {
   @ApiProperty()
@@ -46,7 +47,12 @@ export class CreateUserForCompanyDto {
   @IsString()
   idCompany: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    description: 'choice one option ',
+    isArray: true,
+    enum: Role,
+    example: Object.keys(Role),
+  })
   @IsEnum(Role, { each: true })
   readonly role: Role;
 }
@@ -76,7 +82,12 @@ export class UpdatePermissionUserDto {
   @IsString()
   idCompany: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    description: 'choice one option ',
+    isArray: true,
+    enum: Role,
+    example: Object.keys(Role),
+  })
   @IsOptional()
   @IsEnum(Role, { each: true })
   readonly role: Role;
@@ -91,6 +102,4 @@ export class DeletePermissionUserDto {
   @ApiProperty()
   @IsString()
   idPermission: string;
-
- 
 }

@@ -1,13 +1,31 @@
-import { Body, Controller, Get, Post, Query, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, Req, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { AwsCognitoService } from './aws-cognito.service';
 import { AuthService } from './auth.service';
 import { ApiTags } from '@nestjs/swagger';
 import { ChangePasswordDto, ConfirmPasswordDto, EmailDto, SignInDto, SignUpDto } from './dto/auth.dto';
+import { AuthGuard } from '@nestjs/passport';
+import { GoogleService } from './google.service';
 
 @ApiTags('Auth')
 @Controller('/auth')
 export class AuthController {
-  constructor(private awsCognitoService: AwsCognitoService, private authService: AuthService) {}
+  constructor(
+    private awsCognitoService: AwsCognitoService,
+    private authService: AuthService,
+    private googleService: GoogleService,
+  ) {}
+
+  @Get('google')
+  @UseGuards(AuthGuard('google'))
+  async googleAuth(@Req() req) {
+    return 'google';
+  }
+
+  @Get('google/redirect')
+  @UseGuards(AuthGuard('google'))
+  googleAuthRedirect(@Req() req) {
+    return this.googleService.googleLogin(req);
+  }
 
   @Post('/signup')
   @UsePipes(ValidationPipe)
